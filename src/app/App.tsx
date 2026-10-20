@@ -7,6 +7,8 @@ import { BakeDetailPage } from '../pages/BakeDetail';
 import { BakeEditor } from '../pages/BakeEditor';
 import { Calculator } from '../pages/Calculator';
 import { Journal } from '../pages/Journal';
+import { KitchenMode } from '../pages/KitchenMode';
+import { QuickBake } from '../pages/QuickBake';
 import { ConfigMissing, FullPageLoading, Login, NoAccess } from '../pages/Login';
 import { Settings } from '../pages/Settings';
 import { Stats } from '../pages/Stats';
@@ -40,9 +42,11 @@ function ProtectedApp() {
               </Route>
               <Route element={<Layout mobileNav={false} />}>
                 <Route path="new" element={<BakeEditor mode="new" />} />
-                <Route path="new/quick" element={<BakeEditor mode="new" />} />
+                <Route path="new/quick" element={<QuickBake />} />
                 <Route path="bake/:id/edit" element={<BakeEditor mode="edit" />} />
+                <Route path="bake/:id/repeat" element={<BakeEditor mode="repeat" />} />
               </Route>
+              <Route path="bake/:id/kitchen" element={<KitchenMode />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </CatalogProvider>

@@ -35,11 +35,12 @@ export function deletePreset(uid: string, id: string): Promise<void> {
 
 /**
  * On first sign-in, creates the default presets. The profile doc remembers it so
- * presets the user deletes are not re-created.
+ * presets the user deletes are not re-created. Fixed ids keep it idempotent if it
+ * runs twice (e.g. two tabs on first sign-in).
  */
 export function seedDefaultPresets(uid: string): Preset[] {
   const batch = writeBatch(getDb());
-  const created = DEFAULT_PRESETS.map((p) => ({ ...p, id: newPresetId(uid) }));
+  const created = DEFAULT_PRESETS.map((p, i) => ({ ...p, id: `default-${i + 1}` }));
   for (const p of created) batch.set(userItem(uid, 'presets', p.id), presetToDoc(p));
   batch.set(userDoc(uid), { presetsSeeded: true }, { merge: true });
   void batch.commit().catch(() => undefined);

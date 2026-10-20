@@ -8,7 +8,7 @@ import {
   type DocumentData,
   type WriteBatch,
 } from 'firebase/firestore';
-import type { Bake, PhotoTag } from '../domain/types';
+import type { Bake, BakeInput, PhotoTag } from '../domain/types';
 import { getDb } from './firebase';
 import {
   asBakeType,
@@ -28,7 +28,7 @@ import {
   type NewPhoto,
 } from './photosRepo';
 
-export type BakeInput = Omit<Bake, 'id' | 'createdAt' | 'updatedAt'> & { createdAt?: Date };
+export type { BakeInput };
 
 const ts = (v: unknown) =>
   v instanceof Timestamp ? v.toDate() : v instanceof Date ? v : new Date(0);

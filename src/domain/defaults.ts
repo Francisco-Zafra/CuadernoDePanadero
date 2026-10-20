@@ -2,6 +2,7 @@
 
 import { es } from '../i18n/es';
 import type {
+  BakeInput,
   BakeType,
   Preferment,
   PrefermentKind,
@@ -187,4 +188,22 @@ export function prefermentName(p: Preferment): string {
     default:
       return es.preferments[p.kind];
   }
+}
+
+export function blankBake(type: BakeType = 'bread'): BakeInput {
+  return {
+    name: '',
+    type,
+    date: new Date(),
+    status: 'complete',
+    recipe: emptyRecipe(type),
+    process: [],
+    rating: null,
+    notes: '',
+    nextTime: '',
+    photoIds: [],
+    coverPhotoId: null,
+    thumb: null,
+    sourceBakeId: null,
+  };
 }

@@ -22,7 +22,9 @@ export function BakeRow({ bake, selected }: { bake: Bake; selected?: boolean }) 
             {bake.status === 'incomplete' && <IncompleteMark />}
           </span>
         </span>
-        <span className="bake-row__num">{formatPct(bake.recipe.hydration)}</span>
+        <span className="bake-row__num">
+          {bake.status === 'complete' ? formatPct(bake.recipe.hydration) : '—'}
+        </span>
         <span className={`bake-row__rating${bake.rating == null ? ' is-empty' : ''}`}>
           {formatRating(bake.rating)}
         </span>

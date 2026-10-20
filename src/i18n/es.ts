@@ -156,9 +156,14 @@ export const es = {
       `Valores de tu ${name.toLowerCase()}. Los cambios solo afectan a este horneado.`,
     noteCustom: 'Guardado en tus prefermentos. Lo editas o borras en Ajustes.',
     noteNew: 'Aparecerá en el selector junto a los demás.',
-    summary: (p: { hydration: string; yeast: string; hours: string; seed: boolean }) =>
-      `${p.hydration} de hidratación · ${p.seed ? 'siembra' : 'levadura'} ${p.yeast}${p.hours ? ` · ${p.hours}` : ''}`,
-    summaryWithFlour: (flour: string, rest: string) => `${flour} de la harina · ${rest}`,
+    summary: (p: { hydration: string; yeast: string | null; hours: string; seed: boolean }) =>
+      [
+        `${p.hydration} de hidratación`,
+        p.yeast ? `${p.seed ? 'siembra' : 'levadura'} ${p.yeast}` : null,
+        p.hours || null,
+      ]
+        .filter(Boolean)
+        .join(' · '),
     directDough: 'Masa directa: todo se mezcla de una vez.',
     sectionTitle: 'Prefermento',
     pickerLabel: 'Tipo de prefermento',
@@ -232,7 +237,9 @@ export const es = {
     addStep: 'Añadir fase',
     stepKind: 'Tipo de fase',
     stepLabel: 'Nombre',
-    duration: 'Duración (min)',
+    durationLabel: 'Duración',
+    hours: 'horas',
+    minutes: 'minutos',
     temp: 'Temperatura (°C)',
     note: 'Nota',
     removeStep: (label: string) => `Quitar ${label}`,

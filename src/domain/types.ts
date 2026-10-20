@@ -80,6 +80,9 @@ export interface Bake {
   updatedAt: Date;
 }
 
+/** A bake as edited or saved, before it has an id and timestamps. */
+export type BakeInput = Omit<Bake, 'id' | 'createdAt' | 'updatedAt'> & { createdAt?: Date };
+
 export interface Photo {
   id: string;
   bakeId: string;

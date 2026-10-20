@@ -15,10 +15,15 @@ function read<T>(key: string): T | null {
  * Editor state that is auto-saved to localStorage while editing.
  * `restored` tells whether the initial value came from a saved draft.
  */
-export function useDraft<T>(key: string, initial: () => T, revive: (raw: T) => T = (x) => x) {
-  const [restored] = useState(() => read<T>(key) !== null);
+export function useDraft<T>(
+  key: string,
+  initial: () => T,
+  revive: (raw: T) => T = (x) => x,
+  ignoreSaved = false,
+) {
+  const [restored] = useState(() => !ignoreSaved && read<T>(key) !== null);
   const [value, setValue] = useState<T>(() => {
-    const saved = read<T>(key);
+    const saved = ignoreSaved ? null : read<T>(key);
     return saved !== null ? revive(saved) : initial();
   });
   const dirty = useRef(false);

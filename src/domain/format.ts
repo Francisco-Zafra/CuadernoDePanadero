@@ -48,15 +48,15 @@ export function formatHours(h: number | null): string | null {
   return `${formatNumber(h, 1)} h`;
 }
 
-/** "4 h 30 min", "45 min", "32 h 10 min". */
-export function formatDuration(totalMin: number | null): string {
+/** "4 h 30 min", "45 min", "32 h 10 min" (compact: "32 h 10"). */
+export function formatDuration(totalMin: number | null, compact = false): string {
   if (totalMin == null || !Number.isFinite(totalMin)) return '—';
   const m = Math.round(totalMin);
   const h = Math.floor(m / 60);
   const rest = m % 60;
   if (h === 0) return `${rest} min`;
   if (rest === 0) return `${h} h`;
-  return `${h} h ${rest} min`;
+  return compact ? `${h} h ${rest}` : `${h} h ${rest} min`;
 }
 
 /**

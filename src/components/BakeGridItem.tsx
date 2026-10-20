@@ -8,11 +8,15 @@ import { BakeThumb } from './BakeThumb';
 /** Photo grid cell for the journal. */
 export function BakeGridItem({ bake }: { bake: Bake }) {
   const pref = bake.recipe.preferment;
-  const meta = [
-    pref.kind === 'none' ? es.types[bake.type] : prefermentName(pref),
-    formatPct(bake.recipe.hydration),
-    bake.status === 'incomplete' ? es.journal.incomplete : formatRating(bake.rating),
-  ].join(' · ');
+  const meta = (
+    bake.status === 'incomplete'
+      ? [es.types[bake.type], es.journal.incomplete]
+      : [
+          pref.kind === 'none' ? es.types[bake.type] : prefermentName(pref),
+          formatPct(bake.recipe.hydration),
+          formatRating(bake.rating),
+        ]
+  ).join(' · ');
   return (
     <li>
       <Link to={`/bake/${bake.id}`} className="grid-item">
