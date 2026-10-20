@@ -1,0 +1,90 @@
+/* Design tokens from the "Cuaderno de Masas" design (Sistema visual). */
+:root {
+  --paper: #f7f3ec;
+  --paper-2: #efe8dc;
+  --ink: #1e1a15;
+  --ink-2: #5a5046;
+  --ink-3: #6e6457;
+  --rule: #ddd4c6;
+  --rule-2: #c4b8a6;
+  --crust: #8b4a1f;
+  --on-crust: #fbf6ee;
+  --miga: #eadfc9;
+  --miga-2: #e2d4ba;
+  --focus: #2b5c9e;
+  --danger: #9b2c1f;
+  --on-danger: #fbf6ee;
+  --scrim: rgba(30, 26, 21, 0.45);
+  --bar: #8c8072;
+
+  /* Kitchen mode: higher contrast */
+  --k-bg: #fffdf8;
+  --k-ink: #14110d;
+  --k-ink-2: #3d352c;
+  --k-rule: #8a7f72;
+  --k-accent: #7a3e14;
+
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+
+  --radius: 3px;
+  --gutter: 20px;
+  --tap: 44px;
+  --tap-main: 56px;
+  --nav-h: 84px;
+  --sidebar-w: 236px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #16130f;
+    --paper-2: #221d17;
+    --ink: #efe8dc;
+    --ink-2: #bdb2a2;
+    --ink-3: #a39785;
+    --rule: #352e26;
+    --rule-2: #4d443a;
+    --crust: #d9925e;
+    --on-crust: #1a120b;
+    --miga: #2c251d;
+    --miga-2: #352d23;
+    --focus: #8db4f0;
+    --danger: #ee9a87;
+    --on-danger: #1a0e0b;
+    --scrim: rgba(0, 0, 0, 0.62);
+    --bar: #7d7264;
+    --k-bg: #0b0907;
+    --k-ink: #fbf6ec;
+    --k-ink-2: #dcd2c3;
+    --k-rule: #7d7264;
+    --k-accent: #f0a86f;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --paper: #16130f;
+  --paper-2: #221d17;
+  --ink: #efe8dc;
+  --ink-2: #bdb2a2;
+  --ink-3: #a39785;
+  --rule: #352e26;
+  --rule-2: #4d443a;
+  --crust: #d9925e;
+  --on-crust: #1a120b;
+  --miga: #2c251d;
+  --miga-2: #352d23;
+  --focus: #8db4f0;
+  --danger: #ee9a87;
+  --on-danger: #1a0e0b;
+  --scrim: rgba(0, 0, 0, 0.62);
+  --bar: #7d7264;
+  --k-bg: #0b0907;
+  --k-ink: #fbf6ec;
+  --k-ink-2: #dcd2c3;
+  --k-rule: #7d7264;
+  --k-accent: #f0a86f;
+  color-scheme: dark;
+}
