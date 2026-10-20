@@ -1,0 +1,155 @@
+/* Photos: detail grid, editor step and quick note. */
+
+.photo-grid {
+  list-style: none;
+  margin: 16px 0 10px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 10px;
+  row-gap: 16px;
+}
+
+@media (min-width: 700px) {
+  .photo-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.photo {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.photo__img {
+  display: block;
+  aspect-ratio: 1 / 1;
+  background: var(--miga);
+  overflow: hidden;
+}
+
+.photo__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo__cap {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.detail__photo img.is-thumb {
+  filter: blur(6px);
+  transform: scale(1.05);
+}
+
+/* Editor step */
+
+.photo-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.photo-edit__img {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  background: var(--miga);
+  overflow: hidden;
+}
+
+.photo-edit__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-edit__cover {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  height: 26px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 13px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.photo-edit .input-line {
+  height: var(--tap);
+  font-size: 15px;
+}
+
+.photo-edit__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  min-height: var(--tap);
+}
+
+.photo-edit__actions .icon-btn {
+  margin-left: auto;
+}
+
+.small-btn {
+  min-height: var(--tap);
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--crust);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+
+/* Quick note */
+
+.quick-photo {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.quick-photo__preview {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  background: var(--miga);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+  overflow: hidden;
+}
+
+.quick-photo__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-tile {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  background: transparent;
+  border: 1px dashed var(--rule-2);
+  color: var(--ink-2);
+  font-size: 13px;
+}

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
-import { PhotosStep, usePhotoEditing } from '../components/PhotosStep';
+import { PhotosStep } from '../components/PhotosStep';
 import type { NewCustom } from '../components/PrefermentPicker';
 import { ProcessEditor } from '../components/ProcessEditor';
 import { RatingInput } from '../components/Rating';
@@ -17,6 +17,7 @@ import { useUid } from '../hooks/useAuth';
 import { useBake } from '../hooks/useBake';
 import { useCatalog } from '../hooks/useCatalog';
 import { useDraft } from '../hooks/useDraft';
+import { usePhotoEditing } from '../hooks/usePhotoEditing';
 import { es } from '../i18n/es';
 
 export type EditorMode = 'new' | 'edit' | 'repeat';
@@ -50,7 +51,8 @@ export function BakeEditor({ mode }: { mode: EditorMode }) {
   const { id } = useParams();
   const { bake, loading } = useBake(mode === 'new' ? undefined : id);
   const location = useLocation();
-  const prefill = (location.state as { prefill?: EditorPrefill } | null)?.prefill;
+  const navState = location.state as { prefill?: EditorPrefill; step?: number } | null;
+  const prefill = navState?.prefill;
 
   if (mode !== 'new' && loading) return null;
   if (mode !== 'new' && !bake) {
@@ -86,6 +88,7 @@ export function BakeEditor({ mode }: { mode: EditorMode }) {
       bake={mode === 'edit' ? bake! : null}
       source={mode === 'repeat' ? bake! : null}
       ignoreDraft={!!prefill}
+      startStep={navState?.step ?? 0}
     />
   );
 }
@@ -112,6 +115,7 @@ function EditorForm({
   bake,
   source,
   ignoreDraft,
+  startStep,
 }: {
   draftKey: string;
   mode: EditorMode;
@@ -119,14 +123,15 @@ function EditorForm({
   bake: Bake | null;
   source: Bake | null;
   ignoreDraft: boolean;
+  startStep: number;
 }) {
   const uid = useUid();
   const navigate = useNavigate();
   const toast = useToast();
   const catalog = useCatalog();
   const initialState = useCallback(
-    (): DraftState => ({ bake: initial, step: 0, newCustom: null }),
-    [initial],
+    (): DraftState => ({ bake: initial, step: startStep, newCustom: null }),
+    [initial, startStep],
   );
   const draft = useDraft<DraftState>(draftKey, initialState, reviveDraft, ignoreDraft);
   const { bake: value, step, newCustom } = draft.value;

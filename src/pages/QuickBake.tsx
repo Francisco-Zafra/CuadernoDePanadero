@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { IconIncomplete } from '../components/Icons';
-import { QuickPhoto, useQuickPhoto } from '../components/QuickPhoto';
+import { QuickPhoto } from '../components/QuickPhoto';
 import { useToast } from '../components/Toast';
 import { TypeField } from '../components/TypeField';
 import { newBakeId, saveBake } from '../data/bakesRepo';
@@ -10,6 +10,7 @@ import { blankBake, emptyRecipe } from '../domain/defaults';
 import type { BakeType } from '../domain/types';
 import { useUid } from '../hooks/useAuth';
 import { useDraft } from '../hooks/useDraft';
+import { useQuickPhoto } from '../hooks/useQuickPhoto';
 import { es } from '../i18n/es';
 
 interface QuickDraft {

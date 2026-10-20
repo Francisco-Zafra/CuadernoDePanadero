@@ -76,7 +76,3 @@ export function deletePhotoInBatch(batch: WriteBatch, uid: string, photoId: stri
 export function isPhotoDoc(v: unknown): boolean {
   return isObj(v) && typeof v.bakeId === 'string';
 }
-
-export function photoBlob(p: Pick<Photo, 'data'>): Blob {
-  return new Blob([p.data as Uint8Array<ArrayBuffer>], { type: 'image/webp' });
-}
