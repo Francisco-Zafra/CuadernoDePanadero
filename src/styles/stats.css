@@ -1,0 +1,406 @@
+/* Stats page and charts. Colors from tokens only. */
+
+.stats > .tabs {
+  margin-top: 4px;
+}
+
+.stats__empty {
+  margin-top: 32px;
+}
+
+.stats__summary {
+  margin-top: 22px;
+}
+
+.tiles {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--rule-2);
+}
+
+@media (min-width: 900px) {
+  .tiles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.tile {
+  padding: 18px 14px 18px 0;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tile:nth-child(even) {
+  padding: 18px 0 18px 16px;
+  border-left: 1px solid var(--rule);
+}
+
+@media (min-width: 900px) {
+  .tile,
+  .tile:nth-child(even) {
+    padding: 18px 16px;
+  }
+
+  .tile:first-child {
+    padding-left: 0;
+  }
+
+  .tile + .tile {
+    border-left: 1px solid var(--rule);
+  }
+}
+
+.tile dt {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.tile dd {
+  margin: 0;
+}
+
+.tile__value {
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.tile__value--crust {
+  color: var(--crust);
+}
+
+.tile__unit {
+  font-size: 22px;
+}
+
+.tile__sub {
+  font-size: 13px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.stats__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 56px;
+}
+
+@media (min-width: 1100px) {
+  .stats__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.stats__section {
+  margin-top: 46px;
+  min-width: 0;
+}
+
+.stats__lead {
+  margin: 6px 0 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* SVG charts */
+
+.chart {
+  position: relative;
+  max-width: 560px;
+}
+
+.chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  touch-action: pan-y;
+}
+
+.chart__grid {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.chart__label {
+  fill: var(--ink-3);
+  font-size: 11px;
+  font-family: var(--font-sans);
+}
+
+.chart__line-thin {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+.chart__line-accent {
+  fill: none;
+  stroke: var(--crust);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart__dot {
+  fill: var(--paper);
+  stroke: var(--ink-2);
+  stroke-width: 1.5;
+}
+
+.chart__dot--active {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.chart__cross {
+  stroke: var(--rule-2);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.chart__dot-bread {
+  fill: var(--ink);
+  stroke: var(--paper);
+  stroke-width: 2;
+}
+
+.chart__dot-pizza {
+  fill: var(--paper);
+  stroke: var(--crust);
+  stroke-width: 2;
+}
+
+.chart-tip {
+  position: absolute;
+  z-index: 3;
+  transform: translateX(8px);
+  min-width: 140px;
+  padding: 8px 10px;
+  background: var(--paper);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  color: var(--ink);
+  pointer-events: none;
+}
+
+.chart-tip--left {
+  transform: translateX(calc(-100% - 8px));
+}
+
+.chart-tip__title {
+  font-weight: 600;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend__axis {
+  margin-left: auto;
+}
+
+.legend__line {
+  width: 18px;
+  border-top: 1px solid var(--ink-3);
+}
+
+.legend__line--accent {
+  border-top: 2.5px solid var(--crust);
+}
+
+.legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.legend__dot--ring {
+  background: transparent;
+  border: 2px solid var(--crust);
+}
+
+.legend__dot--crust {
+  width: 12px;
+  height: 12px;
+  background: var(--crust);
+}
+
+.legend__tick {
+  width: 2px;
+  height: 12px;
+  background: var(--bar);
+}
+
+/* Rating by preferment */
+
+.pref-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule-2);
+}
+
+.pref-rows__row,
+.pref-rows__axis {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr) 40px;
+  column-gap: 12px;
+  align-items: center;
+}
+
+.pref-rows__row {
+  min-height: 66px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.pref-rows__name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 15px;
+  font-weight: 500;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.pref-rows__n {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+.pref-rows__track {
+  position: relative;
+  height: 24px;
+}
+
+.pref-rows__track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 12px;
+  border-top: 1px solid var(--rule-2);
+}
+
+.pref-rows__tick {
+  position: absolute;
+  top: 5px;
+  width: 2px;
+  height: 14px;
+  margin-left: -1px;
+  background: var(--bar);
+}
+
+.pref-rows__mean {
+  position: absolute;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border-radius: 50%;
+  background: var(--crust);
+  border: 2px solid var(--paper);
+}
+
+.pref-rows__value {
+  text-align: right;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.pref-rows__axis {
+  margin-top: 6px;
+}
+
+.pref-rows__axis-track {
+  position: relative;
+  height: 16px;
+}
+
+.pref-rows__axis-track span {
+  position: absolute;
+  width: 20px;
+  margin-left: -10px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* Bakes per month */
+
+.months__bars {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  height: 150px;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 6px;
+  align-items: end;
+  border-bottom: 1px solid var(--ink);
+}
+
+.months__bars li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  height: 100%;
+}
+
+.months__n {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.months__bar {
+  width: 100%;
+  background: var(--bar);
+  border-radius: 2px 2px 0 0;
+}
+
+.months__bar.is-current {
+  background: var(--crust);
+}
+
+.months__labels {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 6px;
+  margin-top: 6px;
+}
+
+.months__labels span {
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-3);
+}

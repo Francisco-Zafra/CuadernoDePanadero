@@ -62,7 +62,11 @@ export function KitchenMode() {
           <h2 id="k-recipe" className="kitchen__h2">
             {es.kitchen.recipe}
           </h2>
-          <WeighList recipe={bake.recipe} kitchen />
+          {bake.status === 'complete' ? (
+            <WeighList recipe={bake.recipe} kitchen />
+          ) : (
+            <p className="kitchen__hint">{es.recipe.noRecipe}</p>
+          )}
         </section>
 
         {bake.process.length > 0 && (

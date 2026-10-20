@@ -164,6 +164,7 @@ export const es = {
       ]
         .filter(Boolean)
         .join(' · '),
+    summaryWithFlour: (flour: string, rest: string) => `${flour} de la harina · ${rest}`,
     directDough: 'Masa directa: todo se mezcla de una vez.',
     sectionTitle: 'Prefermento',
     pickerLabel: 'Tipo de prefermento',

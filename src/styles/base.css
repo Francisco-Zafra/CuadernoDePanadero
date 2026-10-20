@@ -203,6 +203,7 @@ html {
 }
 
 .link-btn {
+  text-decoration: none;
   min-height: var(--tap);
   display: inline-flex;
   align-items: center;
@@ -698,6 +699,11 @@ select.input-line option {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.radio-tabs--3 .radio-tabs__item {
+  gap: 8px;
+  font-size: 16px;
+}
+
 .radio-tabs__item {
   height: 52px;
   display: flex;
@@ -835,7 +841,6 @@ select.input-line option {
 
 .stepper__input:focus {
   border-bottom-color: currentColor;
-  outline: none;
 }
 
 .stepper__unit {
@@ -1167,10 +1172,6 @@ select.input-line option {
   color: var(--ink);
   font-size: 17px;
   padding: 0;
-}
-
-.search input:focus {
-  outline: none;
 }
 
 .search:focus-within {
