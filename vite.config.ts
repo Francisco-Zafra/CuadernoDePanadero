@@ -12,8 +12,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Cuaderno de Masas',
-        short_name: 'Masas',
+        name: 'Cuaderno de Panadero',
+        short_name: 'CDP',
         description: 'Diario personal de horneados de pan y pizza.',
         lang: 'es',
         start_url: '.',

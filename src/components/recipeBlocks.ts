@@ -1,34 +1,9 @@
-// Turns a DoughResult into labelled display blocks (Prefermento / Masa final).
+// Turns a DoughResult into labelled rows for the weigh table (Prefermento | Masa final).
 
-import {
-  computeDough,
-  sumGrams,
-  sumLinePct,
-  type DoughResult,
-  type Line,
-} from '../domain/bakersMath';
+import { computeDough, type DoughResult, type Line } from '../domain/bakersMath';
 import { prefermentName } from '../domain/defaults';
-import { formatHours, formatPct, formatTemp } from '../domain/format';
 import type { Recipe } from '../domain/types';
 import { es } from '../i18n/es';
-
-export interface DisplayRow {
-  key: string;
-  label: string;
-  line: Line;
-  /** The whole preferment as an ingredient of the final dough. */
-  isPreferment: boolean;
-}
-
-export interface DisplayBlock {
-  key: 'preferment' | 'final';
-  title: string | null;
-  sub: string | null;
-  rows: DisplayRow[];
-  totalLabel: string;
-  totalPct: number;
-  totalGrams: number;
-}
 
 export function lineLabel(line: Line, recipe: Recipe): string {
   switch (line.kind) {
@@ -49,50 +24,59 @@ export function lineLabel(line: Line, recipe: Recipe): string {
   }
 }
 
-function prefYeastLabel(line: Line, recipe: Recipe): string {
-  return line.kind === 'yeast' ? es.recipe.yeast : lineLabel(line, recipe);
+export interface WeighRow {
+  key: string;
+  label: string;
+  /** Grams in the preferment column; null when the ingredient is not there. */
+  pref: Line | null;
+  final: Line | null;
+  isPreferment: boolean;
 }
 
-function rows(lines: Line[], recipe: Recipe, inPref: boolean): DisplayRow[] {
-  return lines.map((line, i) => ({
-    key: `${line.kind}-${i}`,
-    label: inPref ? prefYeastLabel(line, recipe) : lineLabel(line, recipe),
-    line,
-    isPreferment: line.kind === 'preferment',
-  }));
-}
-
-export function recipeBlocks(
-  recipe: Recipe,
-  result: DoughResult = computeDough(recipe),
-): DisplayBlock[] {
-  const blocks: DisplayBlock[] = [];
-  const pref = recipe.preferment;
-  const name = prefermentName(pref);
-  if (result.preferment) {
-    blocks.push({
-      key: 'preferment',
-      title: es.recipe.prefermentBlock,
-      sub: es.recipe.prefSub(
-        name,
-        formatHours(pref.hours),
-        formatTemp(pref.tempC),
-        formatPct(pref.hydration),
-      ),
-      rows: rows(result.preferment, recipe, true),
-      totalLabel: name,
-      totalPct: sumLinePct(result.preferment),
-      totalGrams: sumGrams(result.preferment),
-    });
-  }
-  blocks.push({
-    key: 'final',
-    title: result.preferment ? es.recipe.finalBlock : null,
-    sub: result.preferment ? es.recipe.finalSub : null,
-    rows: rows(result.final, recipe, false),
-    totalLabel: es.recipe.totalDough,
-    totalPct: sumLinePct(result.final),
-    totalGrams: sumGrams(result.final),
+/** One row per ingredient with its preferment and final-dough grams side by side. */
+export function weighRows(recipe: Recipe, result: DoughResult = computeDough(recipe)): WeighRow[] {
+  const pref = result.preferment ?? [];
+  const of = (lines: Line[], kind: Line['kind']) => lines.filter((l) => l.kind === kind);
+  const row = (key: string, label: string, p: Line | null, f: Line | null): WeighRow => ({
+    key,
+    label,
+    pref: p,
+    final: f,
+    isPreferment: f?.kind === 'preferment',
   });
-  return blocks;
+  const out: WeighRow[] = [];
+
+  const prefFlour = of(pref, 'flour')[0] ?? null;
+  const finalFlours = of(result.final, 'flour');
+  if (prefFlour && finalFlours.length !== 1)
+    out.push(row('flour-pref', lineLabel(prefFlour, recipe), prefFlour, null));
+  finalFlours.forEach((f, i) =>
+    out.push(
+      row(`flour-${i}`, lineLabel(f, recipe), finalFlours.length === 1 ? prefFlour : null, f),
+    ),
+  );
+
+  const water = of(result.final, 'water')[0] ?? null;
+  out.push(row('water', es.recipe.water, of(pref, 'water')[0] ?? null, water));
+  for (const s of of(result.final, 'salt')) out.push(row('salt', es.recipe.salt, null, s));
+
+  const prefYeast = of(pref, 'yeast')[0] ?? null;
+  const finalYeast = of(result.final, 'yeast')[0] ?? null;
+  if (prefYeast || finalYeast)
+    out.push(
+      row(
+        'yeast',
+        prefYeast || !finalYeast ? es.recipe.yeast : lineLabel(finalYeast, recipe),
+        prefYeast,
+        finalYeast,
+      ),
+    );
+  for (const s of of(pref, 'starter')) out.push(row('starter', es.preferments.seed, s, null));
+
+  of(result.final, 'extra').forEach((e, i) =>
+    out.push(row(`extra-${i}`, lineLabel(e, recipe), null, e)),
+  );
+  for (const p of of(result.final, 'preferment'))
+    out.push(row('pref', lineLabel(p, recipe), null, p));
+  return out;
 }

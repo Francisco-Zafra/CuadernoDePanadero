@@ -153,3 +153,13 @@
   color: var(--ink-2);
   font-size: 13px;
 }
+
+.photo-uploader {
+  display: inline-flex;
+  flex-wrap: wrap;
+  column-gap: 20px;
+}
+
+.photo-uploader--tiles {
+  gap: 12px;
+}

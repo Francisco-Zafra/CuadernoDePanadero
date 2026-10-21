@@ -1,8 +1,8 @@
 import { deleteDoc, doc, getDocs, setDoc, type DocumentData } from 'firebase/firestore';
 import {
   DEFAULT_PREFERMENTS,
+  OFFERED_PREFERMENT_KINDS,
   isBuiltinPreferment,
-  type BuiltinPrefermentKind,
 } from '../domain/defaults';
 import type { SavedPreferment } from '../domain/types';
 import { num, numOrNull, str } from './normalize';
@@ -38,7 +38,7 @@ export async function listPreferments(uid: string): Promise<SavedPreferment[]> {
 }
 
 export function mergeWithBuiltins(stored: SavedPreferment[]): SavedPreferment[] {
-  const builtins = (Object.keys(DEFAULT_PREFERMENTS) as BuiltinPrefermentKind[]).map(
+  const builtins = OFFERED_PREFERMENT_KINDS.map(
     (k) => stored.find((s) => s.id === k) ?? DEFAULT_PREFERMENTS[k],
   );
   const custom = stored

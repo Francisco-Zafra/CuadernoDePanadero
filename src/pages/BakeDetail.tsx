@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { metaLine } from '../components/bakeText';
+import { doughSummary, metaLine } from '../components/bakeText';
 import { ConfirmInline } from '../components/ConfirmInline';
 import { BakeHero, BakePhotos } from '../components/BakePhotos';
 import { IconEdit, IconKitchen, IconRepeat, IconTrash } from '../components/Icons';
 import { ProcessTimeline } from '../components/ProcessTimeline';
 import { RatingDisplay } from '../components/Rating';
-import { RecipeTable } from '../components/RecipeTable';
 import { SectionNav } from '../components/SectionNav';
 import { SkeletonBlock } from '../components/Skeleton';
 import { useToast } from '../components/Toast';
+import { WeighTable } from '../components/WeighTable';
 import { deleteBake } from '../data/bakesRepo';
 import { errorMessage } from '../data/errors';
-import { computeDough, totalDoughWeight } from '../domain/bakersMath';
+import { totalDoughWeight } from '../domain/bakersMath';
 import { formatDate, formatDuration, formatGrams, formatPct } from '../domain/format';
 import { totalDurationMin } from '../domain/process';
 import type { Bake } from '../domain/types';
@@ -81,7 +81,6 @@ export function BakeDetail({ bake, embedded = false }: { bake: Bake; embedded?: 
     }
   };
 
-  const dough = computeDough(bake.recipe);
   // Quick notes carry a placeholder recipe until they are completed.
   const hasRecipe = bake.status === 'complete';
   const totalMin = totalDurationMin(bake.process);
@@ -189,10 +188,8 @@ export function BakeDetail({ bake, embedded = false }: { bake: Bake; embedded?: 
             </h2>
             {hasRecipe ? (
               <>
-                <p className="section-lead">
-                  {es.recipe.pctOverFlour(formatGrams(dough.totalFlour))}
-                </p>
-                <RecipeTable recipe={bake.recipe} />
+                <p className="section-lead">{doughSummary(bake.recipe)}</p>
+                <WeighTable recipe={bake.recipe} />
               </>
             ) : (
               <p className="muted-italic">{es.recipe.noRecipe}</p>

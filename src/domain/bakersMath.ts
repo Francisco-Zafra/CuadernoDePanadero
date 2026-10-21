@@ -55,17 +55,42 @@ export function totalDoughWeight(recipe: Recipe): number {
   return recipe.pieces * recipe.pieceWeight;
 }
 
-/** Total flour F such that all ingredients add up exactly to the dough weight W. */
-export function totalFlourFor(recipe: Recipe): number {
-  const W = totalDoughWeight(recipe);
+/** Dough weight per gram of total flour (1 + the sum of every other % / 100). */
+function doughPerFlour(recipe: Recipe): number {
   const pctSum =
     recipe.hydration +
     recipe.salt +
     finalYeastPct(recipe) +
     sumPct(recipe.extras) +
     prefermentYeastOverTotalPct(recipe);
-  const divisor = 1 + pctSum / 100;
-  return divisor > 0 ? W / divisor : 0;
+  return 1 + pctSum / 100;
+}
+
+/** Total flour F such that all ingredients add up exactly to the dough weight W. */
+export function totalFlourFor(recipe: Recipe): number {
+  const divisor = doughPerFlour(recipe);
+  return divisor > 0 ? totalDoughWeight(recipe) / divisor : 0;
+}
+
+/** Inverse of totalFlourFor: the piece weight that yields `flour` grams of total flour. */
+export function pieceWeightForFlour(recipe: Recipe, flour: number): number {
+  return recipe.pieces > 0 ? (flour * doughPerFlour(recipe)) / recipe.pieces : 0;
+}
+
+/** How the dough is sized: by total flour or by piece weight. */
+export type SizeBy = 'flour' | 'piece';
+
+/** Rescales the piece weight so `recipe` keeps `flour` grams of total flour. */
+export function withFlour(recipe: Recipe, flour: number): Recipe {
+  return {
+    ...recipe,
+    pieceWeight: pieceWeightForFlour(recipe, flour),
+  };
+}
+
+/** Applies an edit; in flour mode the total flour stays fixed and the piece weight follows it. */
+export function resize(prev: Recipe, next: Recipe, sizeBy: SizeBy): Recipe {
+  return sizeBy === 'flour' ? withFlour(next, totalFlourFor(prev)) : next;
 }
 
 export function computeDough(recipe: Recipe): DoughResult {

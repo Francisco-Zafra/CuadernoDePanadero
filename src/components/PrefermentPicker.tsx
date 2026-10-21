@@ -1,10 +1,14 @@
-import { prefermentFrom } from '../domain/defaults';
-import type { Preferment, SavedPreferment } from '../domain/types';
+import { useState } from 'react';
+import { prefermentFrom, prefermentName } from '../domain/defaults';
+import { formatHours, formatPct } from '../domain/format';
+import type { Preferment } from '../domain/types';
 import { useCatalog } from '../hooks/useCatalog';
 import { es } from '../i18n/es';
 import { prefermentSummary } from './bakeText';
+import { Fold } from './Fold';
 import { IconPlus } from './Icons';
 import { PrefermentParams } from './PrefermentParams';
+import { Tabs } from './Tabs';
 
 export interface NewCustom {
   id: string;
@@ -12,81 +16,75 @@ export interface NewCustom {
 }
 
 interface Props {
+  id: string;
+  headingClassName: string;
   value: Preferment;
   onChange: (p: Preferment) => void;
-  /** A custom preferment being created in this form (not saved yet). */
-  newCustom: NewCustom | null;
-  onNewCustomChange: (c: NewCustom | null) => void;
+  /** A custom preferment being created in this form (not saved yet). Omit to disable creating one. */
+  newCustom?: NewCustom | null;
+  onNewCustomChange?: (c: NewCustom | null) => void;
+  /** Only the amounts: no hours, temperature or notes (the calculator). */
+  compact?: boolean;
 }
 
-function isSelected(value: Preferment, saved: SavedPreferment | 'none'): boolean {
-  if (saved === 'none') return value.kind === 'none';
-  if (value.kind === 'custom') return value.customId === saved.id;
-  return value.kind === saved.id;
-}
+const keyOf = (p: Preferment) => (p.kind === 'custom' ? (p.customId ?? 'custom') : p.kind);
 
-/** Radio list of preferments (none, built-ins, custom) plus the selected one's values. */
-export function PrefermentPicker({ value, onChange, newCustom, onNewCustomChange }: Props) {
+const blankCustom = (id: string): Preferment => ({
+  kind: 'custom',
+  customId: id,
+  name: es.preferments.newName,
+  flourPct: 20,
+  hydration: 100,
+  yeastPct: 0.5,
+  hours: 12,
+  tempC: 20,
+});
+
+/** Preferment section: tabs (none, built-ins, custom) and the selected one's values in a grid. */
+export function PrefermentPicker({
+  id,
+  headingClassName,
+  value,
+  onChange,
+  newCustom = null,
+  onNewCustomChange,
+  compact,
+}: Props) {
   const { preferments, newPrefermentId } = useCatalog();
+  const [open, setOpen] = useState(false);
   const isNew = newCustom != null && value.kind === 'custom' && value.customId === newCustom.id;
+  const key = keyOf(value);
 
-  const options: { key: string; name: string; desc: string; on: boolean; pick: () => void }[] = [
-    {
-      key: 'none',
-      name: es.preferments.none,
-      desc: es.preferments.oneBlock,
-      on: isSelected(value, 'none'),
-      pick: () => onChange({ ...value, kind: 'none' }),
-    },
-    ...preferments.map((p) => {
-      const builtin = ['poolish', 'biga', 'sourdough'].includes(p.id);
-      const summary = prefermentSummary(p, p.id === 'sourdough');
-      return {
-        key: p.id,
-        name: p.name,
-        desc: builtin ? summary : `${es.preferments.custom} · ${summary}`,
-        on: isSelected(value, p),
-        pick: () => onChange(prefermentFrom(p)),
-      };
-    }),
+  const options = [
+    { value: 'none', label: es.preferments.none },
+    ...preferments.map((p) => ({ value: p.id, label: p.name })),
   ];
-  if (newCustom && !preferments.some((p) => p.id === newCustom.id)) {
+  if (newCustom && !preferments.some((p) => p.id === newCustom.id))
     options.push({
-      key: newCustom.id,
-      name: isNew ? value.name || es.preferments.newName : es.preferments.newName,
-      desc: es.preferments.noteNew,
-      on: isNew,
-      pick: () =>
-        onChange({
-          kind: 'custom',
-          customId: newCustom.id,
-          name: es.preferments.newName,
-          flourPct: 20,
-          hydration: 100,
-          yeastPct: 0.5,
-          hours: 12,
-          tempC: 20,
-        }),
+      value: newCustom.id,
+      label: isNew ? value.name || es.preferments.newName : es.preferments.newName,
     });
-  }
+  // A bake can point at a preferment no longer offered (old sourdough, a deleted custom one).
+  if (!options.some((o) => o.value === key))
+    options.push({ value: key, label: prefermentName(value) });
+
+  const pick = (id: string) => {
+    if (id === key) return;
+    if (id === 'none') return onChange({ ...value, kind: 'none' });
+    if (newCustom && id === newCustom.id) return onChange(blankCustom(id));
+    const saved = preferments.find((p) => p.id === id);
+    if (saved) onChange(prefermentFrom(saved));
+  };
 
   const addCustom = () => {
     const id = newPrefermentId();
-    onNewCustomChange({ id, save: true });
-    onChange({
-      kind: 'custom',
-      customId: id,
-      name: es.preferments.newName,
-      flourPct: 20,
-      hydration: 100,
-      yeastPct: 0.5,
-      hours: 12,
-      tempC: 20,
-    });
+    onNewCustomChange?.({ id, save: true });
+    onChange(blankCustom(id));
+    setOpen(true);
   };
 
   const note =
-    value.kind === 'none'
+    compact || value.kind === 'none'
       ? null
       : isNew
         ? es.preferments.noteNew
@@ -94,53 +92,60 @@ export function PrefermentPicker({ value, onChange, newCustom, onNewCustomChange
           ? es.preferments.noteCustom
           : es.preferments.noteDefault(es.preferments[value.kind]);
 
+  const summary = es.preferments.summaryWithFlour(
+    formatPct(value.flourPct),
+    prefermentSummary(compact ? { ...value, hours: null } : value, value.kind === 'sourdough'),
+  );
+  const hours = formatHours(value.hours || null);
+  const headNote =
+    value.kind === 'none' ? es.preferments.direct : hours ? es.recipe.prefHoursBefore(hours) : null;
+
   return (
-    <div className="pref-picker">
-      <fieldset className="radio-list">
-        <legend className="sr-only">{es.preferments.pickerLabel}</legend>
-        {options.map((o) => (
-          <label key={o.key} className="radio-row">
-            <input type="radio" name="preferment" checked={o.on} onChange={o.pick} />
-            <span className="radio-row__text">
-              <span className="radio-row__name">{o.name}</span>
-              <span className="radio-row__desc">{o.desc}</span>
-            </span>
-          </label>
-        ))}
-      </fieldset>
-      {!newCustom && (
-        <button type="button" className="link-btn" onClick={addCustom}>
-          <IconPlus size={18} />
-          {es.preferments.custom}
-        </button>
-      )}
+    <section className="form-section pref-picker" aria-labelledby={id}>
+      <div className="section-head">
+        <h2 id={id} className={headingClassName}>
+          {es.preferments.sectionTitle}
+        </h2>
+        {headNote && <span className="section-note">{headNote}</span>}
+      </div>
+      <div className="pref-picker__row">
+        <Tabs label={es.preferments.pickerLabel} value={key} onChange={pick} options={options} />
+        {onNewCustomChange && !newCustom && (
+          <button type="button" className="link-btn link-btn--sm" onClick={addCustom}>
+            <IconPlus size={16} />
+            {es.preferments.custom}
+          </button>
+        )}
+      </div>
 
       {value.kind !== 'none' && (
-        <div className="pref-picker__params">
-          {value.kind === 'custom' && (
-            <label className="field">
-              <span className="field-label">{es.preferments.name}</span>
-              <input
-                className="input-title input-title--sm"
-                value={value.name ?? ''}
-                onChange={(e) => onChange({ ...value, name: e.target.value })}
-              />
-            </label>
-          )}
-          <PrefermentParams value={value} onChange={onChange} />
-          {isNew && (
-            <label className="check">
-              <input
-                type="checkbox"
-                checked={newCustom.save}
-                onChange={(e) => onNewCustomChange({ ...newCustom, save: e.target.checked })}
-              />
-              {es.preferments.saveToMine}
-            </label>
-          )}
-          {note && <p className="hint">{note}</p>}
-        </div>
+        <Fold summary={summary} open={open} onToggle={() => setOpen(!open)}>
+          <div className="pref-picker__params">
+            {value.kind === 'custom' && (
+              <label className="field">
+                <span className="field-label">{es.preferments.name}</span>
+                <input
+                  className="input-title input-title--sm"
+                  value={value.name ?? ''}
+                  onChange={(e) => onChange({ ...value, name: e.target.value })}
+                />
+              </label>
+            )}
+            <PrefermentParams value={value} onChange={onChange} compact={compact} grid />
+            {isNew && onNewCustomChange && (
+              <label className="check">
+                <input
+                  type="checkbox"
+                  checked={newCustom.save}
+                  onChange={(e) => onNewCustomChange({ ...newCustom, save: e.target.checked })}
+                />
+                {es.preferments.saveToMine}
+              </label>
+            )}
+            {note && <p className="hint">{note}</p>}
+          </div>
+        </Fold>
       )}
-    </div>
+    </section>
   );
 }

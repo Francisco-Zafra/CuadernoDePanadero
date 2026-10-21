@@ -88,7 +88,7 @@ export function downloadBlob(blob: Blob, filename: string) {
 
 export function exportFilename(now = new Date()): string {
   const p = (n: number) => String(n).padStart(2, '0');
-  return `cuaderno-de-masas-${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}.json`;
+  return `cuaderno-de-panadero-${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}.json`;
 }
 
 export interface ParsedImport {

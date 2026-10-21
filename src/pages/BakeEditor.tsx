@@ -240,14 +240,18 @@ function EditorForm({
         )}
         {source && step === 0 && <p className="hint">{es.editor.repeatedFrom(source.name)}</p>}
 
-        <div className="step-head">
-          <p className="step-kicker">{es.editor.stepOf(step + 1, steps.length)}</p>
-          <h1 className="step-title">{step === 0 ? es.editor.basicTitle : steps[step]}</h1>
-          {step === 0 && <p className="step-lead">{es.editor.basicLead}</p>}
-          {step === 1 && <p className="step-lead">{es.recipe.lead}</p>}
-          {step === 2 && <p className="step-lead">{es.process.lead}</p>}
-          {step === 3 && <p className="step-lead">{es.photos.lead}</p>}
-        </div>
+        {step === 1 ? (
+          // The recipe step goes straight to the form; the progress bar already names it.
+          <h1 className="sr-only">{steps[step]}</h1>
+        ) : (
+          <div className="step-head">
+            <p className="step-kicker">{es.editor.stepOf(step + 1, steps.length)}</p>
+            <h1 className="step-title">{step === 0 ? es.editor.basicTitle : steps[step]}</h1>
+            {step === 0 && <p className="step-lead">{es.editor.basicLead}</p>}
+            {step === 2 && <p className="step-lead">{es.process.lead}</p>}
+            {step === 3 && <p className="step-lead">{es.photos.lead}</p>}
+          </div>
+        )}
 
         {step === 0 && (
           <BasicStep

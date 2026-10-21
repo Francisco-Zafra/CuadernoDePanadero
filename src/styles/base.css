@@ -541,7 +541,7 @@ html {
 }
 
 .page-head {
-  padding-top: 28px;
+  padding-top: 14px;
   display: flex;
   flex-direction: column;
 }
@@ -560,25 +560,13 @@ html {
   min-width: 0;
 }
 
-.page-head__kicker {
-  margin: 0;
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 16px;
-  color: var(--ink-3);
-}
-
 .page-head .double-rule {
-  margin-top: 16px;
+  margin-top: 8px;
 }
 
 @media (min-width: 960px) {
   .page-head {
     padding-top: 32px;
-  }
-
-  .page-head__kicker {
-    display: none;
   }
 }
 

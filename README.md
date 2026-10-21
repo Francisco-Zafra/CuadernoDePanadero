@@ -1,4 +1,4 @@
-# Cuaderno de Masas
+# Cuaderno de Panadero
 
 App web personal (PWA) para apuntar horneados de pan y pizza: receta en porcentaje de panadero con prefermentos, proceso, fotos, valoración, calculadora de masa y estadísticas.
 
@@ -33,7 +33,7 @@ Se hacen una sola vez. Necesitas una cuenta de Google y una de GitHub.
 ### 1. Crear el proyecto de Firebase (plan Spark)
 
 1. Entra en <https://console.firebase.google.com> y pulsa **Crear un proyecto**.
-2. Ponle un nombre (por ejemplo `cuaderno-de-masas`). Google Analytics no hace falta: puedes desactivarlo.
+2. Ponle un nombre (por ejemplo `cuaderno-de-panadero`). Google Analytics no hace falta: puedes desactivarlo.
 3. El proyecto se crea en el plan **Spark** (gratuito). No añadas ninguna forma de pago: así es imposible que te cobren nada.
 
 ### 2. Activar el inicio de sesión con Google

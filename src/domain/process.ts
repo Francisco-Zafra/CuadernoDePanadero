@@ -1,7 +1,7 @@
 // Process helpers: keep the preferment step first and in sync with the recipe.
 
 import { newStep, prefermentName } from './defaults';
-import type { Preferment, ProcessStep } from './types';
+import type { BakeStage, Preferment, ProcessStep, ProcessStepKind } from './types';
 
 /**
  * If the recipe has a preferment, the first step must be its own; it takes its
@@ -18,6 +18,44 @@ export function syncPrefermentStep(steps: ProcessStep[], pref: Preferment): Proc
     tempC: pref.tempC,
   };
   return [step, ...rest];
+}
+
+/** Which values make sense for each kind of step (the preferment step takes its own). */
+export interface StepFields {
+  /** 'min' for short steps, 'hm' (hours + minutes) for long ones, null when time does not matter. */
+  duration: 'min' | 'hm' | null;
+  temp: boolean;
+  folds?: boolean;
+  stages?: boolean;
+}
+
+export const STEP_FIELDS: Record<Exclude<ProcessStepKind, 'preferment'>, StepFields> = {
+  autolyse: { duration: 'min', temp: false },
+  mix: { duration: 'min', temp: true },
+  folds: { duration: null, temp: false, folds: true },
+  bulk: { duration: 'hm', temp: true },
+  cold: { duration: 'hm', temp: true },
+  shape: { duration: null, temp: false },
+  proof: { duration: 'hm', temp: true },
+  bake: { duration: null, temp: false, stages: true },
+  other: { duration: 'hm', temp: true },
+};
+
+/** A bake's stretches; older bakes only have one duration and temperature. */
+export function bakeStages(step: ProcessStep): BakeStage[] {
+  if (step.stages && step.stages.length > 0) return step.stages;
+  return [{ min: step.durationMin, tempC: step.tempC, note: '' }];
+}
+
+/** Sum of the stretches' known minutes (null when none is known). */
+export function stagesDurationMin(stages: BakeStage[]): number | null {
+  const known = stages.filter((s) => s.min != null);
+  return known.length === 0 ? null : known.reduce((sum, s) => sum + (s.min ?? 0), 0);
+}
+
+/** Folds span: count × interval, once both are known. */
+export function foldsDurationMin(count: number | null, everyMin: number | null): number | null {
+  return count != null && everyMin != null ? count * everyMin : null;
 }
 
 export function totalDurationMin(steps: ProcessStep[]): number | null {

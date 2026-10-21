@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { computeDough, roundGrams, sumGrams, totalFlourFor, type Line } from './bakersMath';
+import {
+  computeDough,
+  pieceWeightForFlour,
+  resize,
+  roundGrams,
+  sumGrams,
+  totalFlourFor,
+  type Line,
+} from './bakersMath';
 import { DEFAULT_PREFERMENTS, NO_PREFERMENT, prefermentFrom } from './defaults';
 import type { Recipe } from './types';
 
@@ -37,6 +45,24 @@ describe('computeDough', () => {
       expect(sumGrams(res.final)).toBeCloseTo(r.pieces * r.pieceWeight, 9);
       expect(res.totals.dough).toBe(r.pieces * r.pieceWeight);
     }
+  });
+
+  it('sizes the dough from the total flour', () => {
+    const recipes: Recipe[] = [
+      base({ pieces: 3, extras: [{ name: 'Aceite', pct: 3 }] }),
+      base({ preferment: prefermentFrom(DEFAULT_PREFERMENTS.poolish) }),
+    ];
+    for (const r of recipes) {
+      const res = computeDough({ ...r, pieceWeight: pieceWeightForFlour(r, 500) });
+      expect(res.totalFlour).toBeCloseTo(500, 9);
+    }
+  });
+
+  it('keeps the flour in flour mode and the piece weight in piece mode', () => {
+    const prev = base();
+    const next = { ...prev, hydration: prev.hydration + 10 };
+    expect(totalFlourFor(resize(prev, next, 'flour'))).toBeCloseTo(totalFlourFor(prev), 9);
+    expect(resize(prev, next, 'piece').pieceWeight).toBe(prev.pieceWeight);
   });
 
   it('computes a straight dough as a single block', () => {

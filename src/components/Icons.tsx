@@ -124,6 +124,13 @@ export const IconCamera = (p: IconProps) => (
     <circle cx="12" cy="13" r="3.5" />
   </Svg>
 );
+export const IconImage = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="4" y="5" width="16" height="14" rx="1.5" />
+    <circle cx="9" cy="10" r="1.5" />
+    <path d="M20 16l-5-5-8 8" />
+  </Svg>
+);
 export const IconClose = (p: IconProps) => (
   <Svg strokeWidth={2.2} {...p}>
     <path d="M6 6l12 12M18 6L6 18" />

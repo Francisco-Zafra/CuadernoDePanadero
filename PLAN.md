@@ -1,5 +1,5 @@
 
-# Cuaderno de Masas — Plan de implementación
+# Cuaderno de Panadero — Plan de implementación
 
 App web personal (PWA) para registrar horneados de pan y pizza: receta en porcentaje de panadero con prefermentos, proceso, fotos, valoración, calculadora de masa y estadísticas.
 

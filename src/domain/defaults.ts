@@ -18,6 +18,8 @@ export const RATING_STEP = 0.5;
 
 export type BuiltinPrefermentKind = Exclude<PrefermentKind, 'none' | 'custom'>;
 export const BUILTIN_PREFERMENT_KINDS: BuiltinPrefermentKind[] = ['poolish', 'biga', 'sourdough'];
+/** Built-ins offered in pickers and settings. Sourdough is still understood (old bakes) but not offered. */
+export const OFFERED_PREFERMENT_KINDS: BuiltinPrefermentKind[] = ['poolish', 'biga'];
 
 export const DEFAULT_PREFERMENTS: Record<BuiltinPrefermentKind, SavedPreferment> = {
   poolish: {
@@ -113,9 +115,9 @@ export const DEFAULT_PRESETS: Omit<Preset, 'id'>[] = [
       ],
       hydration: 75,
       salt: 2,
-      yeast: { kind: 'none', pct: 0 },
+      yeast: { kind: 'instant', pct: 0.5 },
       extras: [],
-      preferment: prefermentFrom(DEFAULT_PREFERMENTS.sourdough),
+      preferment: { ...NO_PREFERMENT },
     },
   },
   {

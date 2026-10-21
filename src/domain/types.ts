@@ -50,6 +50,13 @@ export interface Recipe {
   preferment: Preferment;
 }
 
+/** One stretch of the bake: "20 min a 230 °C, tapa cerrada". */
+export interface BakeStage {
+  min: number | null;
+  tempC: number | null;
+  note: string;
+}
+
 export interface ProcessStep {
   id: string;
   kind: ProcessStepKind;
@@ -57,6 +64,11 @@ export interface ProcessStep {
   durationMin: number | null;
   tempC: number | null;
   note: string;
+  /** Folds only: how many, and minutes between them. */
+  foldCount?: number | null;
+  foldEveryMin?: number | null;
+  /** Bake only: its stretches in order; durationMin is their sum. */
+  stages?: BakeStage[];
 }
 
 export interface Bake {

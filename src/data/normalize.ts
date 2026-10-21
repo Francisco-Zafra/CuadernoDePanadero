@@ -85,6 +85,18 @@ export function normalizeProcess(v: unknown): ProcessStep[] {
     durationMin: numOrNull(s.durationMin),
     tempC: numOrNull(s.tempC),
     note: str(s.note),
+    ...(s.kind === 'folds'
+      ? { foldCount: numOrNull(s.foldCount), foldEveryMin: numOrNull(s.foldEveryMin) }
+      : {}),
+    ...(s.kind === 'bake' && Array.isArray(s.stages)
+      ? {
+          stages: s.stages.filter(isObj).map((st) => ({
+            min: numOrNull(st.min),
+            tempC: numOrNull(st.tempC),
+            note: str(st.note),
+          })),
+        }
+      : {}),
   }));
 }
 

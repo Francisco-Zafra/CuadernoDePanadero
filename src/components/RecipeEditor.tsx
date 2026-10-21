@@ -1,16 +1,12 @@
 import { useState } from 'react';
-import { totalDoughWeight } from '../domain/bakersMath';
-import { formatGrams } from '../domain/format';
-import type { Ingredient, Recipe, YeastKind } from '../domain/types';
-import { convertYeast } from '../domain/yeast';
+import type { Ingredient, Recipe } from '../domain/types';
 import { es } from '../i18n/es';
+import { resize, type SizeBy } from '../domain/bakersMath';
+import { DoughSection } from './DoughSection';
 import { IconClose, IconPlus } from './Icons';
 import { NumberField } from './NumberField';
 import { PrefermentPicker, type NewCustom } from './PrefermentPicker';
-import { RecipeTable, type RecipeView } from './RecipeTable';
-import { Stepper } from './Stepper';
-import { adaptiveStep } from './steps';
-import { Tabs } from './Tabs';
+import { WeighTable } from './WeighTable';
 
 interface Props {
   recipe: Recipe;
@@ -19,105 +15,30 @@ interface Props {
   onNewCustomChange: (c: NewCustom | null) => void;
 }
 
-const YEAST_KINDS: YeastKind[] = ['fresh', 'instant', 'active_dry', 'none'];
-
-/** Full recipe form: dough size, percentages, preferment, flours, extras and the result table. */
+/** Full recipe form: preferment, dough size and percentages, flours, extras and the result table. */
 export function RecipeEditor({ recipe, onChange, newCustom, onNewCustomChange }: Props) {
-  const [view, setView] = useState<RecipeView>('both');
-  const set = (patch: Partial<Recipe>) => onChange({ ...recipe, ...patch });
-
-  const changeYeastKind = (kind: YeastKind) => {
-    const from = recipe.yeast.kind;
-    set({ yeast: { kind, pct: convertYeast(recipe.yeast.pct, from, kind) } });
-  };
+  const [sizeBy, setSizeBy] = useState<SizeBy>('flour');
+  const set = (patch: Partial<Recipe>) => onChange(resize(recipe, { ...recipe, ...patch }, sizeBy));
 
   return (
     <div className="recipe-editor">
-      <section className="form-section" aria-labelledby="dough-t">
-        <h2 id="dough-t" className="h2">
-          {es.calculator.dough}
-        </h2>
-        <div className="steppers steppers--ruled">
-          <Stepper
-            label={es.recipe.pieces}
-            sub={es.recipe.piecesSub(recipe.pieces)}
-            value={recipe.pieces}
-            onChange={(v) => set({ pieces: Math.max(1, Math.round(v)) })}
-            min={1}
-            decimals={0}
-          />
-          <Stepper
-            label={es.recipe.pieceWeight}
-            sub={`${es.recipe.totalDough}: ${formatGrams(totalDoughWeight(recipe))}`}
-            value={recipe.pieceWeight}
-            onChange={(v) => set({ pieceWeight: v })}
-            step={10}
-            min={10}
-            decimals={0}
-            unit="g"
-          />
-          <Stepper
-            label={es.recipe.hydration}
-            sub={es.recipe.hydrationSub}
-            value={recipe.hydration}
-            onChange={(v) => set({ hydration: v })}
-            min={30}
-            max={150}
-            unit="%"
-            accent
-          />
-          <Stepper
-            label={es.recipe.salt}
-            sub={es.recipe.saltSub}
-            value={recipe.salt}
-            onChange={(v) => set({ salt: v })}
-            step={0.1}
-            max={10}
-            unit="%"
-          />
-          <label className="select-row">
-            <span className="stepper__label">{es.recipe.yeastKind}</span>
-            <select
-              className="input-line"
-              value={recipe.yeast.kind}
-              onChange={(e) => changeYeastKind(e.target.value as YeastKind)}
-            >
-              {YEAST_KINDS.map((k) => (
-                <option key={k} value={k}>
-                  {es.recipe.yeastKinds[k]}
-                </option>
-              ))}
-            </select>
-          </label>
-          {recipe.yeast.kind !== 'none' && (
-            <Stepper
-              label={es.recipe.yeast}
-              sub={
-                recipe.preferment.kind === 'none'
-                  ? es.recipe.yeastKinds[recipe.yeast.kind]
-                  : es.recipe.yeastFinalSub(es.recipe.yeastKinds[recipe.yeast.kind])
-              }
-              value={recipe.yeast.pct}
-              onChange={(v) => set({ yeast: { ...recipe.yeast, pct: v } })}
-              step={adaptiveStep}
-              decimals={2}
-              unit="%"
-            />
-          )}
-        </div>
-      </section>
+      <PrefermentPicker
+        id="pref-t"
+        headingClassName="h2"
+        value={recipe.preferment}
+        onChange={(p) => set({ preferment: p })}
+        newCustom={newCustom}
+        onNewCustomChange={onNewCustomChange}
+      />
 
-      <section className="form-section" aria-labelledby="pref-t">
-        <h2 id="pref-t" className="h2">
-          {es.preferments.sectionTitle}
-        </h2>
-        <PrefermentPicker
-          value={recipe.preferment}
-          onChange={(p) => set({ preferment: p })}
-          newCustom={newCustom}
-          onNewCustomChange={onNewCustomChange}
-        />
-      </section>
+      <DoughSection
+        id="dough-t"
+        headingClassName="h2"
+        recipe={recipe}
+        onChange={onChange}
+        sizeBy={sizeBy}
+        onSizeByChange={setSizeBy}
+      />
 
       <section className="form-section" aria-labelledby="flours-t">
         <h2 id="flours-t" className="h2">
@@ -154,22 +75,10 @@ export function RecipeEditor({ recipe, onChange, newCustom, onNewCustomChange }:
       </section>
 
       <section className="form-section" aria-labelledby="ing-t">
-        <div className="section-head">
-          <h2 id="ing-t" className="h2">
-            {es.recipe.ingredients}
-          </h2>
-          <Tabs<RecipeView>
-            label={es.recipe.showAs}
-            value={view}
-            onChange={setView}
-            options={[
-              { value: 'both', label: '% y g' },
-              { value: 'pct', label: '%' },
-              { value: 'grams', label: 'g' },
-            ]}
-          />
-        </div>
-        <RecipeTable recipe={recipe} view={view} />
+        <h2 id="ing-t" className="h2">
+          {es.recipe.ingredients}
+        </h2>
+        <WeighTable recipe={recipe} />
       </section>
     </div>
   );

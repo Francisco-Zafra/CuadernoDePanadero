@@ -3,9 +3,9 @@
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
 export const es = {
-  appName: 'Cuaderno de Masas',
+  appName: 'Cuaderno de Panadero',
   appNameTop: 'Cuaderno',
-  appNameBottom: 'de Masas',
+  appNameBottom: 'de Panadero',
 
   nav: {
     sections: 'Secciones',
@@ -48,7 +48,7 @@ export const es = {
   login: {
     kicker: 'Pan y pizza en casa',
     titleTop: 'Cuaderno',
-    titleBottom: 'de Masas',
+    titleBottom: 'de Panadero',
     lead: 'Apunta cada horneado: la receta, los tiempos y lo que cambiarías la próxima vez.',
     google: 'Entrar con Google',
     signingIn: 'Abriendo Google…',
@@ -86,7 +86,7 @@ export const es = {
     photoUnreadable:
       'No se pudo leer la imagen. Usa una foto en JPG, PNG, WebP o HEIC compatible con tu navegador.',
     notFound: 'Este horneado no existe o se ha borrado.',
-    importInvalid: 'El archivo no es una exportación válida del Cuaderno de Masas.',
+    importInvalid: 'El archivo no es una exportación válida del Cuaderno de Panadero.',
     saveFailed: 'No se pudo guardar. Comprueba la conexión y vuelve a intentarlo.',
   },
 
@@ -140,10 +140,12 @@ export const es = {
     oneBlock: 'La receta va en un solo bloque',
     flourPct: 'Harina en el prefermento',
     flourPctSub: 'Sobre la harina total',
+    flourPctShort: '% de la harina',
     hydration: 'Hidratación',
     hydrationSub: 'Agua sobre su harina',
     yeast: 'Levadura',
     seed: 'Masa madre madura',
+    seedShort: 'Siembra',
     yeastSub: 'Sobre su harina',
     hours: 'Tiempo',
     hoursSub: 'Antes de amasar',
@@ -165,20 +167,32 @@ export const es = {
         .filter(Boolean)
         .join(' · '),
     summaryWithFlour: (flour: string, rest: string) => `${flour} de la harina · ${rest}`,
-    directDough: 'Masa directa: todo se mezcla de una vez.',
+    direct: 'Masa directa',
     sectionTitle: 'Prefermento',
     pickerLabel: 'Tipo de prefermento',
   },
 
   recipe: {
     title: 'Receta',
-    lead: 'Los porcentajes van sobre toda la harina, también la del prefermento. Los gramos se calculan solos.',
-    pctOverFlour: (g: string) => `Porcentajes sobre toda la harina: ${g}.`,
     pieces: 'Piezas',
-    piecesSub: (n: number) => (n === 1 ? 'Una pieza' : 'Bolas o panes'),
     pieceWeight: 'Peso por pieza',
     pieceWeightSub: 'Masa cruda',
     totalDough: 'Masa total',
+    doughSummary: (p: {
+      flour: string;
+      pieces: number;
+      piece: string;
+      hydration: string;
+      salt: string;
+      yeast: string | null;
+    }) =>
+      [
+        `${p.flour} de harina`,
+        `${p.pieces} × ${p.piece}`,
+        `${p.hydration} de hidratación`,
+        `sal ${p.salt}`,
+        p.yeast ? `levadura ${p.yeast}` : 'sin levadura',
+      ].join(' · '),
     hydration: 'Hidratación total',
     hydrationSub: 'Agua sobre toda la harina',
     salt: 'Sal',
@@ -192,6 +206,13 @@ export const es = {
       active_dry: 'Seca activa',
       none: 'Sin levadura',
     },
+    yeastShort: {
+      fresh: 'Lev. fresca',
+      instant: 'Lev. seca',
+      active_dry: 'Lev. seca activa',
+      none: 'Sin levadura',
+    },
+    piecesCount: (n: number) => `${n} ${plural(n, 'pieza', 'piezas')}`,
     yeastConverted: (from: string, to: string) =>
       `Convertida de ${from.toLowerCase()} a ${to.toLowerCase()}.`,
     flours: 'Harinas',
@@ -207,26 +228,13 @@ export const es = {
     extraPlaceholder: 'Aceite, azúcar, malta…',
     ingredients: 'Ingredientes',
     colIngredient: 'Ingrediente',
-    colPct: '%',
     colGrams: 'Gramos',
-    showPct: 'Ver %',
-    showGrams: 'Ver gramos',
-    showAs: 'Mostrar como',
-    prefermentBlock: 'Prefermento',
     finalBlock: 'Masa final',
-    finalSub: 'Con todo el prefermento',
-    prefSub: (name: string, hours: string | null, temp: string | null, hyd: string) =>
-      [name, hours ? `${hours} a ${temp ?? '—'}` : null, `${hyd} de hidratación`]
-        .filter(Boolean)
-        .join(' · '),
     prefHoursBefore: (h: string) => `Prepáralo ${h} antes`,
     prefEntire: (name: string) => `${name} entero`,
     flour: 'Harina',
     flourMix: 'Harina (mezcla)',
     water: 'Agua',
-    totalHydration: 'Hidratación total',
-    totalHydrationSub: (water: string, flour: string, hasPref: boolean) =>
-      `${water} de agua sobre ${flour} de harina${hasPref ? ', prefermento incluido' : ''}`,
     warnNegativeWater:
       'El prefermento ya lleva más agua que la hidratación total. Baja su hidratación o su porcentaje de harina.',
     noRecipe: 'Todavía no hay receta apuntada.',
@@ -262,12 +270,34 @@ export const es = {
     empty: 'Sin fases apuntadas.',
     lead: 'Añade las fases en orden. Si hay prefermento, la primera es la suya.',
     prefStepHint: 'Su duración y temperatura salen del prefermento.',
+    foldsLabel: 'Pliegues',
+    tempAt: 'a',
+    stageNote: 'Detalle del tramo',
+    stageNoteHints: ['tapa cerrada', 'tapa abierta', 'con vapor', 'sin vapor'],
+    addStage: 'Añadir tramo',
+    removeStage: (n: number) => `Quitar tramo ${n}`,
+    stageSummary: (min: string | null, temp: string | null, note: string) =>
+      [[min, temp].filter(Boolean).join(' a '), note].filter(Boolean).join(', '),
+    foldCount: 'número de pliegues',
+    foldEvery: 'minutos entre pliegues',
+    foldsEvery: 'cada',
+    foldsSummary: (n: number | null, every: number | null) =>
+      [
+        n != null ? `${n} ${plural(n, 'pliegue', 'pliegues')}` : null,
+        every != null ? `cada ${every} min` : null,
+      ]
+        .filter(Boolean)
+        .join(' '),
   },
 
   photos: {
     title: 'Fotos',
     add: 'Añadir foto',
     addShort: 'Añadir',
+    takePhoto: 'Hacer foto',
+    camera: 'Cámara',
+    fromGallery: 'Elegir de la galería',
+    gallery: 'Galería',
     tagLabel: 'Etiqueta',
     tags: {
       crust: 'Corteza',
@@ -364,7 +394,14 @@ export const es = {
     startFrom: 'Partir de',
     myPresets: 'Mis presets',
     dough: 'Masa',
+    sizeBy: 'Calcular por',
+    sizeByFlour: 'Harina',
+    sizeByPiece: 'Pieza',
+    flourWeight: 'Harina total',
+    flourWeightSub: (dough: string) => `Masa total: ${dough}`,
     weighThis: 'Pesa esto',
+    total: 'Total',
+    notInBlock: 'No lleva',
     summary: (n: number, w: string) => `${n} ${plural(n, 'pieza', 'piezas')} × ${w}`,
     saveAsBake: 'Guardar como horneado',
     savePreset: 'Guardar como preset',
@@ -421,7 +458,7 @@ export const es = {
     process: 'Proceso',
     tapWhenDone: 'Toca una fase al terminarla.',
     now: 'Ahora',
-    hoursBefore: (h: string) => `${h} antes`,
+    prefBefore: (name: string, h: string) => `${name}: ${h} antes.`,
   },
 
   settings: {

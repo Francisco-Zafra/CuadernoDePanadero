@@ -1,6 +1,7 @@
-import { formatDuration, formatTemp } from '../domain/format';
+import { formatDuration } from '../domain/format';
 import type { ProcessStep } from '../domain/types';
 import { es } from '../i18n/es';
+import { stepDetail } from './bakeText';
 
 /** Read-only process: a vertical line with one dot per step. */
 export function ProcessTimeline({ steps }: { steps: ProcessStep[] }) {
@@ -9,7 +10,7 @@ export function ProcessTimeline({ steps }: { steps: ProcessStep[] }) {
     <ol className="timeline">
       {steps.map((s, i) => {
         const isPref = s.kind === 'preferment';
-        const detail = [formatTemp(s.tempC), s.note.trim()].filter(Boolean).join(' · ');
+        const detail = stepDetail(s);
         return (
           <li
             key={s.id}
